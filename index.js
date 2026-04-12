@@ -12,9 +12,6 @@ dotenv.config();
 
 const app = express();
 
-// DB connect
-connectDB();
-
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -35,8 +32,29 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// DB connection for serverless
+let isConnected = false;
+
+const ensureDbConnection = async () => {
+  if (isConnected) {
+    return;
+  }
+  try {
+    await connectDB();
+    isConnected = true;
+  } catch (error) {
+    console.error('DB Connection Error:', error);
+  }
+};
+
+// Middleware to ensure DB connection before each request
+app.use(async (req, res, next) => {
+  await ensureDbConnection();
+  next();
+});
 
 // routes
 app.get("/", (req, res) => {
