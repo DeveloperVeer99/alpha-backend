@@ -55,14 +55,7 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Don't allow updating super admins
-    if (user.role === 'superadmin') {
-      return res.status(403).json({ 
-        success: false, 
-        message: "Cannot update super admin accounts" 
-      });
-    }
-
+    // Allow updating any user including superadmins
     // Update fields
     if (name) user.name = name;
     if (username) user.username = username;
