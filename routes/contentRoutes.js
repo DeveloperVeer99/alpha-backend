@@ -25,6 +25,10 @@ router.get("/:key", async (req, res) => {
 
     const doc = await Content.findOne({ key });
 
+    // Never let any layer (browser/CDN) cache editable content —
+    // otherwise fresh saves can appear to "revert" on refresh.
+    res.set("Cache-Control", "no-store");
+
     res.status(200).json({
       success: true,
       data: doc ? doc.data : null,
@@ -43,6 +47,8 @@ router.get("/", async (_req, res) => {
     docs.forEach((doc) => {
       data[doc.key] = doc.data;
     });
+
+    res.set("Cache-Control", "no-store");
 
     res.status(200).json({
       success: true,

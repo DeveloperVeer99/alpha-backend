@@ -62,9 +62,9 @@ const courseSchema = new mongoose.Schema({
   },
 });
 
-courseSchema.pre("save", function (next) {
+// Mongoose 9 hooks are promise-style — no `next` callback
+ courseSchema.pre("save", function () {
   this.updatedAt = new Date();
-  next();
 });
 
 module.exports = mongoose.model("Course", courseSchema);

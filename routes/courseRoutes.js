@@ -7,6 +7,7 @@ const { adminAuth } = require("../middleware/authMiddleware");
 router.get("/", async (_req, res) => {
   try {
     const courses = await Course.find({ isActive: true }).sort({ createdAt: 1 });
+    res.set("Cache-Control", "no-store");
     res.status(200).json({ success: true, data: courses });
   } catch (error) {
     console.error("Get courses error:", error);
@@ -57,7 +58,11 @@ router.put("/:id", adminAuth, async (req, res) => {
       updates.highlights = Array.isArray(updates.highlights) ? updates.highlights.filter((h) => h && String(h).trim()) : [];
     }
 
-    const course = await Course.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+    const course = await Course.findByIdAndUpdate(
+      req.params.id,
+      { ...updates, updatedAt: new Date() },
+      { new: true, runValidators: true }
+    );
 
     if (!course) {
       return res.status(404).json({ success: false, message: "Course not found" });
