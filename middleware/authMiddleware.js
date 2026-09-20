@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 
-exports.protect = async (req, res, next) => {
+// Protect admin routes: requires a valid admin JWT (issued by secret-key login)
+exports.adminAuth = (req, res, next) => {
   try {
     let token;
 
@@ -14,30 +14,14 @@ exports.protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select("-password");
 
-    if (!req.user) {
-      return res.status(401).json({ message: "User not found" });
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized as admin" });
     }
 
+    req.admin = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: "Not authorized, token failed" });
-  }
-};
-
-exports.admin = (req, res, next) => {
-  if (req.user && req.user.role === "superadmin") {
-    next();
-  } else {
-    res.status(403).json({ message: "Not authorized as super admin" });
-  }
-};
-
-exports.analyst = (req, res, next) => {
-  if (req.user && (req.user.role === "analyst" || req.user.role === "superadmin")) {
-    next();
-  } else {
-    res.status(403).json({ message: "Not authorized as analyst" });
   }
 };

@@ -1,12 +1,12 @@
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const signalRoutes = require("./routes/signalRoutes");
-const messageRoutes = require("./routes/messageRoutes");
-const blogRoutes = require("./routes/blogRoutes");
+const contentRoutes = require("./routes/contentRoutes");
 
 dotenv.config();
 
@@ -18,8 +18,6 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://tradersregion.in",
-  "https://www.tradersregion.in",
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
@@ -28,36 +26,29 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // routes
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "TradersRegion API running 🚀",
-    version: "2.0.0",
+  res.json({
+    message: "Alpha Circle API running 🚀",
+    version: "3.0.0",
     status: "active"
   });
 });
 
 app.get("/api", (req, res) => {
-  res.json({ 
-    message: "TradersRegion API v2.0",
+  res.json({
+    message: "Alpha Circle API v3.0",
     endpoints: {
-      auth: "/api/auth",
-      users: "/api/users",
-      signals: "/api/signals",
-      messages: "/api/messages",
-      blogs: "/api/blogs"
+      auth: "/api/auth"
     }
   });
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/signals", signalRoutes);
-app.use("/api/messages", messageRoutes);
-app.use("/api/blogs", blogRoutes);
+app.use("/api/content", contentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
