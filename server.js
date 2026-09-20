@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const contentRoutes = require("./routes/contentRoutes");
+const courseRoutes = require("./routes/courseRoutes");
 
 dotenv.config();
 
@@ -49,6 +50,7 @@ app.get("/api", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/content", contentRoutes);
+app.use("/api/courses", courseRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

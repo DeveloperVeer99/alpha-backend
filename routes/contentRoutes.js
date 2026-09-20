@@ -8,8 +8,9 @@ const SECTION_KEYS = [
   "mentor",
   "curriculum",
   "community",
-  "enroll",
+  "courses",
   "faq",
+  "cta",
   "footer",
 ];
 
